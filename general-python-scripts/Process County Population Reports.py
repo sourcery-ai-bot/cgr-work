@@ -27,17 +27,16 @@ def get_gender(header):
 def get_month(p):
     m = int(p.lower().strip('p'))
     if m < 7:
-        m = m + 6
+        m += 6
     else:
-        m = m - 6
+        m -= 6
     return(m)
     
 def get_year(fy):
-    y = int(fy.lower().strip('fy'))
-    return(y)
+    return int(fy.lower().strip('fy'))
     
 def standardize_columns(column_names):
-    clean = list()
+    clean = []
     for item in column_names:
         item = item.replace('*','')
         clean.append(item)
@@ -65,10 +64,7 @@ for filename in g.glob("*.xls"):
         # rename the columns
         df.columns = column_names
         # Add the location
-        if sheet_name == 'Summary':
-            df['Location'] = 'Massachusetts'
-        else:
-            df['Location'] = sheet_name
+        df['Location'] = 'Massachusetts' if sheet_name == 'Summary' else sheet_name
         # Add the gender based on the first column
         df['Gender'] = df.iloc[:,0].apply(get_gender)
         # Pull the year and month from the file name
@@ -85,16 +81,16 @@ for filename in g.glob("*.xls"):
         column_names = df.columns.values.tolist()
         column_names[0] = 'Jurisdiction of Origin'
         df.columns = standardize_columns(column_names)
-        
+
         # Concatinate all the df's togethe
         if 'mass_sheriffs_data' in locals():
             mass_sheriffs_data = mass_sheriffs_data.append(df, ignore_index=True)
         else:
             mass_sheriffs_data = df
-        
+
 # Reorder the columns
 mass_sheriffs_data = mass_sheriffs_data[column_names]
-        
+
 print('Saving the file')
 writer = pd.ExcelWriter('Total County Correction Population.xlsx', engine='xlsxwriter')
 mass_sheriffs_data.to_excel(writer,'MA_Sheriffs_Association_Total_C', index=False)

@@ -9,7 +9,7 @@ df = pd.read_excel(
     converters={"BEDS Code":str}
 )
 
-model = dict()
+model = {}
 
 for index, row in df.iterrows():
     model[row["BEDS Code"]] = dict(row)

@@ -21,7 +21,7 @@ years = range(start_year, end_year+1)
 
 def parse_lehd_html(html, search_text):
     """Scrapes HTML for search text and returns a dictionary"""
-    data = dict()
+    data = {}
     soup = BeautifulSoup(html, 'html5lib')
     for i in soup.find_all('tr'):
         for find_me in search_text:
@@ -39,13 +39,13 @@ search_text = ('Employed in the Selection Area but Living Outside',
 
 engine = create_engine('mysql+pymysql://user:password@server/db')
 conn = engine.connect()
-    
+
 sql = 'SELECT CGR_GEO_ID, NAME, LEHD_URL FROM CGR_GeographyIndex WHERE CI_GEO=1 AND LEHD_URL IS NOT NULL'
 
 query = conn.execute(sql)
 browser = webdriver.Chrome()
 
-data = list()
+data = []
 
 for row in query:
     print('Getting data for '+row[1])
@@ -65,7 +65,7 @@ for row in query:
         temp['year'] = year
         temp['CGR_GEO_ID'] = row[0]
         data.append(temp)
-        
+
 browser.quit()
 
 df = pd.DataFrame(data)

@@ -93,7 +93,7 @@ def handle_990PF(row, xml):
     return data
 
 
-holes = list()
+holes = []
 filler = []
 
 df = pd.read_excel("Select Non-Profits List.xlsx", dtype={"EIN": object})

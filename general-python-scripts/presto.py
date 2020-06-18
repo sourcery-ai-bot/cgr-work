@@ -26,8 +26,8 @@ def aggregate_acs_data(df, var_list, return_float=False):
     """Aggregate estimates and margins of error specified in var_list and
     found in df and return a list with the aggregated estimate and margin
     of error"""
-    est = list()
-    moe = list()
+    est = []
+    moe = []
     if var_list is False:
         return [None, None]
     for v in var_list:
@@ -70,8 +70,7 @@ def get_cpi_inflator(year, base_year):
     cpi = a.fetchone()[0]
     b = hub.query('SELECT * FROM US_CPIInflator_BLS WHERE `year` = '+str(base_year))
     base_cpi = b.fetchone()[0]
-    inflator = base_cpi / cpi
-    return inflator
+    return base_cpi / cpi
     
     
 def get_cpi_year():
@@ -87,49 +86,49 @@ def get_sum_aggregates(df, aggregate_me):
     # Get geographies in data frame
     geos = df.geo_id.unique()
     # Build a data frame of geographies to aggreate
-    aggregate_data = list()
-    for a in aggregate_me:
-        if a[1] not in geos:
-            aggregate_data.append({'geo_id': a[0], 'aggregate_id': a[1]})
+    aggregate_data = [
+        {'geo_id': a[0], 'aggregate_id': a[1]}
+        for a in aggregate_me
+        if a[1] not in geos
+    ]
+
     aggregate_data = pd.DataFrame(aggregate_data)
-    
+
     # Merge it with our data (inner join)
     df = pd.merge(df, aggregate_data, on='geo_id')
-    
+
     # Set some common values
     df['NAME'] = df['geo_id'] = df['aggregate_id']
-    
+
     # Drop the extra column
     df = df.drop(['aggregate_id'], axis=1)   
-    
+
     # Determine the columns
-    cols_to_keep = list(df.columns.values) 
+    cols_to_keep = list(df.columns.values)
     cols_to_aggregate = [e for e in cols_to_keep if e not in ('NAME', 'geo_id')]
-    
+
     # Deal with the margin of error
     if 'count_moe' in cols_to_aggregate:
         # Square the Margin of Error
         df['count_moe'] = df['count_moe'] ** 2
-    
+
     # Aggregate (Sum)
     df = df.groupby(['NAME', 'geo_id'])[cols_to_aggregate].sum().reset_index()
-    
+
     # Deal with margin of error
     if 'count_moe' in cols_to_aggregate:
         # Square root the sum of squares
         df['count_moe'] = df['count_moe'] ** .5    
-    
+
     return df[cols_to_keep]
 
 def get_weighted_average_aggregate(df, aggregate_me, var_name, weight_var_name):
-    aggregate_data = list()
-    for a in aggregate_me:
-        aggregate_data.append({'geo_id': a[0], 'aggregate_id': a[1]})
+    aggregate_data = [{'geo_id': a[0], 'aggregate_id': a[1]} for a in aggregate_me]
     aggregate_data = pd.DataFrame(aggregate_data)
-    
+
     # Merge it with our data (inner join)
     df = pd.merge(df, aggregate_data, on='geo_id')
-    
+
     # Set some common values
     df['geo_id'] = df['aggregate_id']
 
@@ -140,7 +139,7 @@ def get_weighted_average_aggregate(df, aggregate_me, var_name, weight_var_name):
     temp['estimate'] = temp[var_name] * (temp['weight'] / temp['weight_sum'])
     # Sum up the estimates
     temp = temp.groupby(['geo_id'])['estimate'].sum().reset_index()
-       
+
     return temp
     
     

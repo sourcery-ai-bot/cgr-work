@@ -36,9 +36,7 @@ def flotToInt(text):
 # This will be used later to check meta data line number to make sure they are
 # whole numbers (integers)
 def validMetaData(n):
-    if n%2 == 0 or (n+1)%2 == 0:
-        return True
-    return False
+    return n%2 == 0 or (n+1)%2 == 0
     
 # Get the Sequence & Table Numbers
 print('Downloading Sequence and Table Number Lookup')

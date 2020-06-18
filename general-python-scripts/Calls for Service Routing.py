@@ -15,7 +15,7 @@ root = 'G:/2018 Projects/827-NE Dutchess County Ambulance/Viz/'
 def get_total_length(route, G):
     i = 0
     total_length = 0
-    for r in route:
+    for _ in route:
         if i > 0:
             edge = G.get_edge_data(route[i], route[i-1])
             try:
@@ -23,8 +23,8 @@ def get_total_length(route, G):
                 edge_length = edge[0]['length'] * 0.00062137   
             except:
                 edge_length = 0
-            total_length = total_length + edge_length
-        i = i + 1
+            total_length += edge_length
+        i += 1
     return(total_length)
     
 print('Getting road network')

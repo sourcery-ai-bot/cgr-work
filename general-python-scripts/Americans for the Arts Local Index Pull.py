@@ -56,7 +56,7 @@ for st in states:
             arts_data = arts_data.append(df)
 
     # Update progress bar
-    pb_i = pb_i + 1
+    pb_i += 1
     print(progressBar(pb_i, len(states)))
 
 # Save the Files to the Desktop

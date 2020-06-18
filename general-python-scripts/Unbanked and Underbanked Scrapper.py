@@ -5,6 +5,7 @@ Created on Thu Nov  2 15:41:15 2017
 @author: Michael Silva
 """
 
+
 import requests
 from sqlalchemy import create_engine
 import pandas as pd
@@ -16,7 +17,7 @@ conn = engine.connect()
 query = conn.execute('''SELECT *  FROM `DW_Geography` 
                  WHERE `type` IN ('State', 'County')''').fetchall()
 
-data = list()
+data = []
 
 for row in query:
     i = str(row[0])

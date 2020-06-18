@@ -4,10 +4,11 @@ Created on Fri Jul  1 13:15:28 2016
 
 @author: Michael Silva
 """
+
 import pandas as pd
 import requests
 
-data = list()
+data = []
 service_url = 'http://gisservices.dhses.ny.gov/arcgis/rest/services/Locators/Street_and_Address_Composite/GeocodeServer/findAddressCandidates'
 
 locations = pd.read_excel('Event Locations.xlsx')
@@ -15,7 +16,7 @@ locations = pd.read_excel('Event Locations.xlsx')
 addressess = locations['geocode_me'].tolist()
 i=0
 for address in addressess:
-    i=i+1
+    i += 1
     print(str(i)+' of '+str(len(addressess)))
     full_address = address + ', Victor NY'
     payload = {'SingleLine': full_address, 'f': 'pjson'}

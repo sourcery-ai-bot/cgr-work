@@ -45,16 +45,16 @@ class api(object):
 
         self.api_get_string = ''
         self.api_variables = None
-        self.cache = dict()
+        self.cache = {}
         self.debugging = False
 
         self.df = None
-        
-        self.execptions = list()
+
+        self.execptions = []
         self.exception_report_file_name = None
         self.dataset = None
         self.dataset_info = None
-        
+
         self.total_steps = 0
         self.current_step = 0
 
@@ -114,7 +114,7 @@ class api(object):
             limit.
 
         """
-        chunks = list()
+        chunks = []
         if len(element_list) < n:
             chunks.append(element_list)
         else:
@@ -137,26 +137,26 @@ class api(object):
 
         """
         self.debug_message('Begining data wrangling')
-        chunk_df_cache = dict()
+        chunk_df_cache = {}
         variable_list = self.api_variables
         self.current_step = 0
         self.total_steps = len(self.cache)
         total_steps = self.total_steps
         for key, item in self.cache.items():
-            self.current_step = self.current_step + 1
+            self.current_step += 1
             self.set_progressbar('Processing', self.current_step, total_steps)
             geo_id = item['geo_id']
             response_json = item['data']
             chunk_df = self.process_df_chunk(response_json, variable_list)
-            
+
             # Only keep valid variables
-            keepers = list() 
+            keepers = []
             columns = list(chunk_df.columns)
             for census_var in variable_list:
                 if census_var in columns:
                     keepers.append(census_var)
             chunk_df = chunk_df[keepers]
-                
+
             if geo_id in chunk_df_cache:
                 # We already have "seen" this geo id
                 # Widen the cached data frame with the additional data
@@ -170,7 +170,7 @@ class api(object):
                 # Store it in the cache for further processing
                 chunk_df_cache[geo_id] = chunk_df.copy()
 
-            
+
         # We have run through all the wrangling so let's build the 
         # final data frame from the cache
         for key, chunk_df in chunk_df_cache.items():
@@ -242,8 +242,8 @@ class api(object):
         # Chunk up the variable request
         variable_lists = self.chunk_variable_list(self.api_variables)
         # Build url request list
-        api_urls = list()
-        api_ids = dict()
+        api_urls = []
+        api_ids = {}
         self.debug_message('==================')
         self.debug_message('|| API URL LIST ||')
         self.debug_message('==================')
@@ -271,27 +271,27 @@ class api(object):
             self.debug_message('2nd pass for ' + str(n) + ' exceptions')
             loop.run_until_complete(self.fetch_all(self.exceptions, api_ids))
             n = len(self.exceptions)
-            if n > 0:
-                self.total_steps = n
-                self.current_step = 0
-                print('3rd pass for ' + str(n) + ' requests')
-                #elf.debug_message('3rd pass for ' + str(n) + ' exceptions')
-                #loop.run_until_complete(self.fetch_all(self.exceptions, api_ids))
-                for final_api_url in self.exceptions:
-                    response = self.fetch(final_api_url, api_ids)
-                    self.response_to_cache(response, api_ids)
-                if len(self.exceptions) > 0:
-                    # Exception report
-                    self.debug_message('Unable to pull data ' + str(len(self.exceptions)) + ' times')
-                    self.save_exceptions(api_ids)
-                    self.debug_message('====================')
-                    self.debug_message('|| EXCEPTION LIST ||')
-                    self.debug_message('====================')
-                    i = 0
-                    for e in self.exceptions:
-                        i = i + 1
-                        self.debug_message(str(i) + '. ' + api_ids[e] + ' > ' + e)
-        
+        if n > 0:
+            self.total_steps = n
+            self.current_step = 0
+            print('3rd pass for ' + str(n) + ' requests')
+            #elf.debug_message('3rd pass for ' + str(n) + ' exceptions')
+            #loop.run_until_complete(self.fetch_all(self.exceptions, api_ids))
+            for final_api_url in self.exceptions:
+                response = self.fetch(final_api_url, api_ids)
+                self.response_to_cache(response, api_ids)
+            if len(self.exceptions) > 0:
+                # Exception report
+                self.debug_message('Unable to pull data ' + str(len(self.exceptions)) + ' times')
+                self.save_exceptions(api_ids)
+                self.debug_message('====================')
+                self.debug_message('|| EXCEPTION LIST ||')
+                self.debug_message('====================')
+                i = 0
+                for e in self.exceptions:
+                    i += 1
+                    self.debug_message(str(i) + '. ' + api_ids[e] + ' > ' + e)
+
         self.debug_message('Event Loop Done')
         self.data_wrangling()
         return self.df
@@ -309,7 +309,7 @@ class api(object):
         # Make the requests
         self.total_steps = len(self.for_strings) * len(variable_lists)
 
-        ids = dict()
+        ids = {}
         for geo_id, for_string in self.for_strings.items():
             self.debug_message('Getting data for: ' + str(geo_id))
             for variable_list in variable_lists:
@@ -319,7 +319,7 @@ class api(object):
                 api_url = api_url[:-1]
                 final_api_url = api_url + for_string + self.api_get_string + '&key=' + self.api_key
                 ids[final_api_url] = geo_id
-                
+
                 response = self.fetch(final_api_url, ids)
                 self.response_to_cache(response, ids)
 
@@ -334,27 +334,27 @@ class api(object):
                 response = self.fetch(final_api_url, ids)
                 self.response_to_cache(response, ids)
             n = len(self.exceptions)
-            if n > 0:
-                self.total_steps = n
-                self.current_step = 0
-                print('3rd Pass for ' + str(n) + '  requests')
-                self.debug_message('3rd pass for '+ str(n) + ' exceptions to be pulled synchronously')
-                for final_api_url in self.exceptions:
-                    response = self.fetch(final_api_url, ids)
-                    self.response_to_cache(response, ids)
-                    
-                self.debug_message('Unable to pull data ' + str(len(self.exceptions)) + ' times')
-                if len(self.exceptions) > 0:
-                    # Exception report
-                    self.save_exceptions(ids)
-                    self.debug_message('====================')
-                    self.debug_message('|| EXCEPTION LIST ||')
-                    self.debug_message('====================')
-                    i = 0
-                    for e in self.exceptions:
-                        i = i + 1
-                        self.debug_message(str(i) + '. ' + ids[e] + ' > ' + e)
-                
+        if n > 0:
+            self.total_steps = n
+            self.current_step = 0
+            print('3rd Pass for ' + str(n) + '  requests')
+            self.debug_message('3rd pass for '+ str(n) + ' exceptions to be pulled synchronously')
+            for final_api_url in self.exceptions:
+                response = self.fetch(final_api_url, ids)
+                self.response_to_cache(response, ids)
+
+            self.debug_message('Unable to pull data ' + str(len(self.exceptions)) + ' times')
+            if len(self.exceptions) > 0:
+                # Exception report
+                self.save_exceptions(ids)
+                self.debug_message('====================')
+                self.debug_message('|| EXCEPTION LIST ||')
+                self.debug_message('====================')
+                i = 0
+                for e in self.exceptions:
+                    i += 1
+                    self.debug_message(str(i) + '. ' + ids[e] + ' > ' + e)
+
         self.data_wrangling()
         return self.df        
         
@@ -376,11 +376,11 @@ class api(object):
     def reset(self):
         """ Reset API to initial settings """
         self.debug_message('reset() called')
-        self.cache = dict()
+        self.cache = {}
         self.df = None
         self.total_steps = 0
         self.current_step = 0
-        self.exceptions = list()
+        self.exceptions = []
         return self
     
     def response_to_cache(self, response, ids):
@@ -409,10 +409,10 @@ class api(object):
             f.write(self.dataset_info + "\n")
         i = 0
         for e in self.exceptions:
-            i = i + 1
+            i += 1
             f.write(str(i) + '. (CGR GEO ID:' + ids[e] + ') ' + e + "\n")
         f.close()
-            
+
         return self
 
     def set_api_endpoint(self, api_id):
@@ -473,15 +473,15 @@ class api(object):
         
     def settings(self):
         # Census API Settings
-        census_settings = dict()
-        
+        census_settings = {}
+
         latest_acs_5_year = 2013.5
         previous_acs_5_year = latest_acs_5_year - 5
-        
+
         latest_acs_1_year = 2017
-        
+
         latest_sahie_year = 2017
-        
+
         # ACS 5 Years
         census_settings[2013.5] = {'api_endpoint': '2017/acs/acs5', 'name': '2013-17 ACS',
                                    'year_text': '2013-17', 'inflation_year': 2017,
@@ -507,7 +507,7 @@ class api(object):
         census_settings[2006.5] = {'api_endpoint': '2010/acs5', 'name': '2006-10 ACS',
                                    'year_text': '2006-10', 'inflation_year': 2010, 
                                    'year': 2006.5} 
-        
+
         # Census 2000
         census_settings['2000-sf1'] = {'api_endpoint': '2000/sf1', 'name': 'Census 2000 SF-1',
                                        'year_text': '2000', 'inflation_year': 1999, 
@@ -527,15 +527,15 @@ class api(object):
                                  'year':2016}
         census_settings[2015] = {'api_endpoint': '2015/acs1', 'name': '2015 ACS',
                                  'year_text': '2015', 'inflation_year': 2015,
-                                 'year':2015}    
+                                 'year':2015}
         census_settings[2014] = {'api_endpoint': '2014/acs1', 'name': '2014 ACS',
                                  'year_text': '2014', 'inflation_year': 2014,
                                  'year':2014}
         census_settings[2013] = {'api_endpoint': '2013/acs1', 'name': '2013 ACS',
                                  'year_text': '2013', 'inflation_year': 2013,
                                  'year':2013}       
-        
-        
+
+
         census_settings['2012.5-profile'] = {'api_endpoint': '2016/acs/acs5/profile',
                                              'year_text': '2012-16', 'year':2012.5,
                                              'inflation_year': 2016,}
@@ -552,15 +552,15 @@ class api(object):
         census_settings['sahie'] = {'api_endpoint': 'timeseries/healthins/sahie',  'name': 'SAHIE',
                                     'earliest_year': 2008, 
                                     'latest_year': latest_sahie_year}
-        
+
         # Latest
         census_settings['latest_acs_5_year'] = census_settings[latest_acs_5_year]
         census_settings['previous_acs_5_year'] = census_settings[previous_acs_5_year]
         census_settings['latest_acs_1_year'] = census_settings[latest_acs_1_year]
-        
+
         # CGR's API Key
         census_settings['api_key'] = 'CENSUS API KEY HERE'
-        
+
         return census_settings
 
     def validation_check(self):

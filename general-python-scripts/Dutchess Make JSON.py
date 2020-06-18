@@ -4,6 +4,7 @@ Created on Mon Jul 22 16:09:42 2019
 
 @author: Michael
 """
+
 import time
 start_time = time.time()
 
@@ -11,9 +12,9 @@ import pandas as pd
 import json
 from hashlib import sha1
 
-data = dict()
+data = {}
 keys = set()
-coverage = dict()
+coverage = {}
 
 years_to_average = [2016, 2017, 2018]
 
@@ -138,7 +139,7 @@ def clean_agency(x):
         return "East Fishkill EMS"
     elif x == "EFFD":
         return "East Fishkill Fire"
-    elif x == "EMSTAR" or x == "TRANCARE":
+    elif x in ["EMSTAR", "TRANCARE"]:
         return "EMStar"
     elif x == "FAFD":
         return "Fairview Fire"
@@ -156,7 +157,7 @@ def clean_agency(x):
         return "Milan Fire"
     elif x == "MNFD":
         return "Millerton Fire"
-    elif x == "MOBILE LF" or x == "MOBILELF":
+    elif x in ["MOBILE LF", "MOBILELF"]:
         return "Mobile Life"
     elif x == "NDP":
         return "NDP"

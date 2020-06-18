@@ -5,6 +5,7 @@ Created on Tue Aug  2 08:53:47 2016
 @author: Michael Silva
 """
 
+
 from bs4 import BeautifulSoup
 import requests
 import pandas as pd
@@ -15,7 +16,7 @@ data_year = 2015
 web_page = requests.get('http://livingwage.mit.edu/')
 soup = BeautifulSoup(web_page.content, 'lxml')
 state_urls = list()
-pages_with_data = list()
+pages_with_data = []
 skip_list = ['Living Wage Calculator', 'Articles', 'About', 'Dr. Amy K. Glasmeier', 'Massachusetts Institute of Technology', 'West Arete', 'Sign In']
 
 # Build the list of state links
@@ -23,7 +24,7 @@ print('Getting state pages')
 for link in soup.findAll('a'):
     if 'locations' in link['href']:
         state_urls.append('http://livingwage.mit.edu'+link['href'])
-   
+
 # Build the lsit of pages with data     
 print('Scrapping state pages for links to pages with data')
 for state_url in state_urls:
@@ -32,7 +33,7 @@ for state_url in state_urls:
     for link in soup.findAll('a'):
         if(link.text in skip_list): continue
         pages_with_data.append('http://livingwage.mit.edu'+link['href'])
-       
+
 # Finally scrape the pages with data
 for page_url in pages_with_data:
     print('Scrapping '+page_url)
@@ -58,7 +59,7 @@ for page_url in pages_with_data:
         living_wage_df = living_wage_df.append(temp_df)
     else:
         living_wage_df = temp_df
-        
+
 # Save it as an Excel file
 print('Writing Data')
 writer = pd.ExcelWriter(str(data_year)+' Living Wage.xlsx', engine='xlsxwriter')

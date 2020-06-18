@@ -78,8 +78,14 @@ conn.execute("DROP TABLE IF EXISTS TEMP_US_AirQualityIndexReport_EPA")
 #conn.execute("CREATE TABLE TEMP_US_AirQualityIndexReport_EPA SELECT * FROM US_AirQualityIndexReport_EPA WHERE 1=0")
 
 def clean_item(item):
-    item = item.replace('#','Number').replace('%','Percent').replace('2.5', '25').replace('  ',' ').replace('County','Location').replace('CBSA', 'Location')
-    return item
+    return (
+        item.replace('#', 'Number')
+        .replace('%', 'Percent')
+        .replace('2.5', '25')
+        .replace('  ', ' ')
+        .replace('County', 'Location')
+        .replace('CBSA', 'Location')
+    )
        
 
 for state_name, code in state_codes.items():
@@ -97,9 +103,7 @@ for state_name, code in state_codes.items():
                 df = pd.read_csv(io.StringIO(csv.decode('utf-8')), na_values = '.', dtype={'County Code': object})
                 df['year'] = year
                 # Rename columns
-                new_columns = list()
-                for item in list(df.columns):
-                    new_columns.append(clean_item(item))
+                new_columns = [clean_item(item) for item in list(df.columns)]
                 df.columns = new_columns
                 # Write to data hub
                 df.to_sql(name='TEMP_US_AirQualityIndexReport_EPA', con=conn, if_exists='append', index=False)
@@ -116,9 +120,7 @@ for state_name, code in state_codes.items():
                 df = pd.read_csv(io.StringIO(csv.decode('utf-8')), na_values = '.', dtype={'CBSA Code': object})
                 df['year'] = year
                 # Rename columns
-                new_columns = list()
-                for item in list(df.columns):
-                    new_columns.append(clean_item(item))
+                new_columns = [clean_item(item) for item in list(df.columns)]
                 df.columns = new_columns
                 # Write to data hub
                 df.to_sql(name='TEMP_US_AirQualityIndexReport_EPA', con=conn, if_exists='append', index=False)

@@ -13,8 +13,11 @@ def get_url(address):
     address = address.replace(' ', '+')
     # Convert comma to %2C
     address = address.replace(',', '%2C')
-    url = 'https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?address='+address+'&benchmark=9&format=json'
-    return url
+    return (
+        'https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?address='
+        + address
+        + '&benchmark=9&format=json'
+    )
 
 address = '1600 Pennsylvania Avenue NW, Washington, DC 20500'
 

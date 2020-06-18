@@ -5,6 +5,7 @@ Created on Mon Aug 12 14:24:43 2019
 @author: Michael
 """
 
+
 import re
 import numpy as np
 import pandas as pd
@@ -22,16 +23,12 @@ for txt in text_files:
     current_record_id = None
     with open(txt) as f:
         for line in f:
-            include = True
-            
-            for i in ignore:
-                if i in line:
-                    include = False
-                    
+            include = all(i not in line for i in ignore)
+
             if len(line.strip()) < 1:
                 include = False
-            
-    
+
+
             if include:
                 if "For Date:" in line:
                     date_parts = line.split(":")[1].split("-")
@@ -57,13 +54,13 @@ for txt in text_files:
                         else:
                             record[t[0]] = current_date + " " + t[1]
                         convert_me.add(t[0])
-                
+
 
 df = pd.DataFrame(data)
 
 for c in convert_me:
     df[c] = pd.to_datetime(df[c])
-    
+
 df["Response Time"] = None
 df["First Responder"] = 0
 seen = set()
@@ -71,7 +68,7 @@ df = df.sort_values(["File", "Arvd", "Unit Count"])
 
 for i in df.index:
     if not pd.isnull(df.at[i, "Arvd"]):
-        
+
         df.at[i, "Response Time"] = df.at[i, "Arvd"] - df.at[i, "Disp"]
         df.at[i, "Response Time"] = df.at[i, "Response Time"] / np.timedelta64(1, "m")
         k = df.at[i, "File"] + df.at[i,"ID"]

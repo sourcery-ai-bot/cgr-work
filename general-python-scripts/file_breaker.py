@@ -68,8 +68,7 @@ def file_breaker(path, variable_names, starts, ends = False, print_progress = Fa
 # Stack Overflow
 def file_len(fname):
     with open(fname) as f:
-        for i, l in enumerate(f):
-            pass
+        pass
     return i + 1
 
 path = 'M:\FBI\KCRETA00.DAT'

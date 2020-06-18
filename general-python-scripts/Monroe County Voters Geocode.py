@@ -5,6 +5,7 @@ Created on Mon Aug 22 08:21:52 2016
 @author: Michael
 """
 
+
 import csv, sqlite3
 import re
 import requests
@@ -74,7 +75,7 @@ if create_db:
 	`lng`	NUMERIC DEFAULT NULL
 );""")
     con.commit()
-    
+
     print('Inserting data')
     reader = csv.reader(open('Monroe-County_04-28-2016.csv', encoding='utf-8'))
     for row in reader:
@@ -87,7 +88,7 @@ rows = result.fetchall()
 address_not_found = 0
 i = 0
 for row in rows:
-    i = i+1
+    i += 1
     progress = str(i)+' of '+str(len(rows))+': '
     # Build the address to geocode  
     address_to_geocode = row[0] + ' ' + row[1]  + ' ' + row[2] + ' ' + row[3] + ' ' + row[4] + ', ' + row[5] + ' NY' + ' ' + row[6]
@@ -96,20 +97,20 @@ for row in rows:
     # Geocode the address
     payload = {'SingleLine': address_to_geocode, 'f':'pjson'}
     r = requests.get(service_url, params=payload)
-    
+
     try:
         lat = r.json()['candidates'][0]['location']['y']
         lng = r.json()['candidates'][0]['location']['x']
-        
+
         lng,lat = transform(in_proj,out_proj,lng,lat)
         print(progress+'Saving data '+address_to_geocode)
         sql = 'UPDATE voters SET lat=:lat, lng=:lng WHERE RADDNUMBER=:RADDNUMBER AND RHALFCODE=:RHALFCODE AND RPREDIRECTION=:RPREDIRECTION AND RSTREETNAME=:RSTREETNAME AND RPOSTDIRECTION=:RPOSTDIRECTION AND RCITY=:RCITY AND RZIP5=:RZIP5'
         cur.execute(sql, {'lat':lat, 'lng':lng, 'RADDNUMBER':row[0], 'RHALFCODE':row[1], 'RPREDIRECTION':row[2], 'RSTREETNAME':row[3], 'RPOSTDIRECTION':row[4], 'RCITY':row[5], 'RZIP5':row[6]})
         con.commit()
     except:
-        address_not_found = address_not_found + 1
+        address_not_found += 1
         print(progress+'Address not found '+address_to_geocode)
-    
-   
+
+
 con.close()
 print('There were '+str(address_not_found)+' addresses not found')

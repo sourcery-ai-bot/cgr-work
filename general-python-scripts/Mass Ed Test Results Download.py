@@ -27,14 +27,14 @@ def soup_to_df(soup):
         i=0
         for th in tr.findAll("th"):
             header.append(th.text)
-            i=i+1
-        
+            i += 1
+
         for td in tr.findAll("td"):
             row[i] = td.text
             #print(str(i)+' '+td.text)
-            i=i+1
+            i += 1
 
-        if len(row) > 0: 
+        if row: 
             records.append(row)
     df = pd.DataFrame(records)
     if len(records) > 1 :

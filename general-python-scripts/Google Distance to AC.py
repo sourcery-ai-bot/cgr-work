@@ -4,6 +4,7 @@ Created on Tue Jan 19 09:36:02 2016
 
 @author: Michael
 """
+
 import requests
 from pandas import ExcelWriter
 import pandas as pd
@@ -12,13 +13,13 @@ api_key = 'ENTER API KEY HERE'
 use_lat_lng = True
 
 # Holds the results
-distance_text = list()
-distance_value = list()
+distance_text = []
+distance_value = []
 duration_text = list()
-duration_value = list()
-lat_list = list()
+duration_value = []
+lat_list = []
 lng_list = list()
-fips = list()
+fips = []
 
 # Read in the 2010 Geography Headers
 df_2010 = pd.read_csv('DEC_10_SF1_G001_with_ann.csv')
@@ -30,10 +31,7 @@ df_2010.columns = ['fips', 'label', 'lat','lng']
 for index, row in df_2010.iterrows():
     lat = row['lat']
     lng = row['lng']
-    if use_lat_lng:
-        origin = lat+','+lng
-    else:
-        origin = row['label'].replace(' ','+')
+    origin = lat+','+lng if use_lat_lng else row['label'].replace(' ','+')
     api_url = 'https://maps.googleapis.com/maps/api/distancematrix/json?origins='+origin+'&destinations=Atlantic+City+NJ&units=imperial&key='+api_key
     r = requests.get(api_url)
     show_error = True

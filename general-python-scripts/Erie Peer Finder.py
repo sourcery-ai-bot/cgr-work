@@ -13,7 +13,9 @@ import numpy as np
 import math
 
 def cosine_similarity(a, b):
-    return sum([i*j for i,j in zip(a, b)])/(math.sqrt(sum([i*i for i in a]))* math.sqrt(sum([i*i for i in b])))
+    return sum(i * j for i, j in zip(a, b)) / (
+        math.sqrt(sum(i * i for i in a)) * math.sqrt(sum(i * i for i in b))
+    )
     
 data = dict()
 names = dict()

@@ -43,16 +43,16 @@ def fbi_ucr(path, print_progress = False, return_data_frame = False):
     df = pd.DataFrame(columns=head)
 
     # This temporary dictionary will hold the data
-    temp_dict = dict()
+    temp_dict = {}
 
     # Open the file
     f = open(path, 'r')
 
     for line in f:
         # Loop through the items
-        line_number = line_number + 1
+        line_number += 1
         temp_dict = dict()
-        for i in range(0,len(head)):
+        for i in range(len(head)):
             # This is the begining character.  Since a Python index begins with
             # zero we have to subtract off one
             begin = start[i] - 1
@@ -85,6 +85,5 @@ def fbi_ucr(path, print_progress = False, return_data_frame = False):
 # Stack Overflow
 def file_len(fname):
     with open(fname) as f:
-        for i, l in enumerate(f):
-            pass
+        pass
     return i + 1

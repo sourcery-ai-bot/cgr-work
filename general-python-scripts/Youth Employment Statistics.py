@@ -45,10 +45,7 @@ def unzip(zip_file):
         
         
 def recode_hisp(val):
-        if val == 1:
-            return False
-        else:
-            return True
+    return val != 1
     
     
 def recode_rac1p(val):
@@ -56,7 +53,7 @@ def recode_rac1p(val):
         return "White"
     elif val == 2:
         return "Black"
-    elif val == 3 or val == 4 or val == 5:
+    elif val in [3, 4, 5]:
         return "American Indian"
     elif val == 6:
         return "Asian"

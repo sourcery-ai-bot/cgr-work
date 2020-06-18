@@ -4,7 +4,7 @@ import pandas as pd
 
 areatypes = ['Town', 'County', 'Watershed', 'Regional Planning Area', 'Ecoregion', 'Geophysical Setting', 'State']
 areatypes = ['Town', 'County', 'State']
-data = list()
+data = []
 
 for areatype in areatypes:
 	url = 'http://www.massaudubon.org/losingground/lgv/areatype_query.php'
@@ -26,7 +26,7 @@ for areatype in areatypes:
 			td = [name] + [areatype] + [id] + td
 			data.append(td)
 print('Saving file')
-df=pd.DataFrame(data, columns=['Name', 'Area Type', 'Area ID', 'Description', 'Value', 'Rank'])	
+df=pd.DataFrame(data, columns=['Name', 'Area Type', 'Area ID', 'Description', 'Value', 'Rank'])
 writer = pd.ExcelWriter('MASS Audubon Scrapper Output.xlsx', engine='xlsxwriter')
 df.to_excel(writer, sheet_name='Sheet1')
 writer.save()

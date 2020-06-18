@@ -119,9 +119,8 @@ def download_and_save_data(acs_dict, state_fips, location, api_key, api_url_base
     # Since there is a 50 variable maximum we need to see how many calls
     # to the API we need to make to get all the variables.
     api_calls_needed = (len(acs_dict[table])/49)+1
-    api_calls_done = 0
     variable_range = 49
-    while api_calls_done < api_calls_needed:
+    for api_calls_done in range(api_calls_needed):
         get_string = ''
         print('        API Call Set '+str(api_calls_done+1)+' of '+str(api_calls_needed))
         variable_range_start = variable_range * api_calls_done
@@ -157,12 +156,7 @@ def download_and_save_data(acs_dict, state_fips, location, api_key, api_url_base
         temp = temp.append(place_data)
         temp = temp.append(county_subdivision_data)
         # Add columns if the final data frame is created
-        if api_calls_done == 0:
-            data = temp
-        else:
-            data = pandas.concat([data, temp], axis=1)
-        api_calls_done = api_calls_done + 1
-        
+        data = temp if api_calls_done == 0 else pandas.concat([data, temp], axis=1)
     csv_path = base_dir + '\\' + location + '\\' + table + '.csv'
     # Pull out the Geocode and Name        
     geocode = data['Geocode']

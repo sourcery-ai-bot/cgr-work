@@ -7,6 +7,7 @@ Created on Mon Aug 15 11:39:14 2016
 Use the NYS GIS Geocoder to geocode
 """
 
+
 import requests
 import sqlite3
 from pyproj import Proj, transform
@@ -23,7 +24,7 @@ rows = result.fetchall()
 address_not_found = 0
 i = 0
 for row in rows:
-    i = i+1
+    i += 1
     progress = str(i)+' of '+str(len(rows))+': '
     address_to_geocode = row[0]+', '+row[1]+' NY  '+row[2]
     # Skip the rows that are geocoded
@@ -32,18 +33,18 @@ for row in rows:
         continue
     payload = {'Street':row[0], 'City':row[1], 'State':'NY', 'ZIP':row[2], 'f':'pjson'}
     r = requests.get(service_url, params=payload)
-    
+
     try:
         lat = r.json()['candidates'][0]['location']['y']
         lng = r.json()['candidates'][0]['location']['x']
-        
+
         lng,lat = transform(in_proj,out_proj,lng,lat)
         print(progress+'Saving data '+address_to_geocode)
         sql = 'UPDATE patrons SET lat=:lat, lng=:lng WHERE STREET1=:street AND CITY1=:city AND clean_zip=:zip'
         cur.execute(sql, {'lat':lat, 'lng':lng, 'street':row[0], 'city':row[1], 'zip':row[2]})
         conn.commit()
     except:
-        address_not_found = address_not_found + 1
+        address_not_found += 1
         print(progress+'Address not found '+address_to_geocode)
 
 conn.close()

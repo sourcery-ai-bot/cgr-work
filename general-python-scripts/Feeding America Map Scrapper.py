@@ -5,18 +5,19 @@ Created on Wed Nov  8 13:57:43 2017
 @author: Michael Silva
 """
 
+
 import requests
 import pandas as pd
 from sqlalchemy import create_engine
 
 # This will hold the data scrapped from the API
-scrapped_data = list()
+scrapped_data = []
 
 for year in range(2013, 2016):
     url = "http://map.feedingamerica.org/api/v1/map/county."+str(year)+".overall.null.null.null?sideload[]=county&sideload[]=national&&sideload[]=states"
     response = requests.get(url)
     j = response.json()
-    states = dict()
+    states = {}
     for state in j['states']:
         print('Adding '+state['stateName']+' data for '+str(state['year']))
         states[state['id']] = state['stateName']
@@ -31,7 +32,7 @@ for year in range(2013, 2016):
     national_data['fips'] = '0'
     scrapped_data.append(national_data) 
 
-    
+
 # Saving data to Data Hub
 print('Saving data to hub...')
 df = pd.DataFrame.from_records(scrapped_data)

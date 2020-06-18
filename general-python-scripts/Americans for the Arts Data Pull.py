@@ -4,6 +4,7 @@ Created on Fri Dec 18 11:22:23 2015
 
 @author: Michael Silva
 """
+
 from bs4 import BeautifulSoup
 import pandas as pd
 import urllib, json
@@ -40,7 +41,7 @@ for st in states:
         county_name = county[1]
         print('  Scraping '+county_name+', '+st+' data')
         # Get the measure descriptions
-        measures = list()
+        measures = []
         url = base_url + county_fips
         page = urllib.urlopen(url)
         soup = BeautifulSoup(page.read(), 'html.parser')
@@ -57,7 +58,7 @@ for st in states:
         df['county_name'] = county_name # add county name
         df['state'] = st # add state name
         df['measures'] = measures # add the measures
-        
+
         try:
             arts_data = arts_data.append(df, ignore_index=True)
         except NameError:
@@ -71,7 +72,7 @@ else:
     arts_data['value'] = pd.to_numeric(arts_data['value'].str.replace(r'[$,]', ''), errors='coerce')
     arts_data = arts_data.pivot(index='fips',columns='measures', values='value')
     arts_data['FIPS Code'] = arts_data.index
-    
+
     print('Getting Population Estimates Data')
     pop_est = pd.read_json(pop_est_api)
     ## Rename the columns to be the first row
@@ -82,7 +83,7 @@ else:
     pop_est['FIPS Code'] = pop_est['state'] + pop_est['county']
     pop_est['Population'] = pop_est['POP']
     pop_est = pop_est[['FIPS Code','Population']]
-    
+
     final_data = pd.merge(arts_data, pop_est)
     fips = final_data['FIPS Code']
     final_data.drop(labels=['FIPS Code'], axis=1,inplace = True)

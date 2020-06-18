@@ -68,8 +68,8 @@ def unzip(file_path, member):
 def get_file_name_list(file_starts, years):
     # This function creates a list of the files we are looking for in the zip
     # archives.  It builds file names from their starts adding in the year and
-    # the enb extension.   
-    file_name_list = list()
+    # the enb extension.
+    file_name_list = []
     for f in file_starts:
         for y in years:
             y = right(str(y),2)

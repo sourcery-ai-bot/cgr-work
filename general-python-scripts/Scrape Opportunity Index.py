@@ -4,20 +4,18 @@ Created on Mon Jun 13 16:18:24 2016
 
 @author: Michael
 """
+
 import requests
 import pandas as pd
 
-opportunity_index_data = list()
+opportunity_index_data = []
 
 # Loop through the list of fips codes
 for line in open('fips.csv', 'r', encoding='latin-1'):
-    csv_row = line.split(',') 
+    csv_row = line.split(',')
     # Pull the name
     pos = line.find('"')
-    if pos > 0:
-        name = line[pos:].strip().replace('"','')
-    else:
-        name = csv_row[2].strip()
+    name = line[pos:].strip().replace('"','') if pos > 0 else csv_row[2].strip()
     print('Getting data for '+name)
     # Pull the FIPS code
     fips = csv_row[1]
@@ -32,7 +30,7 @@ for line in open('fips.csv', 'r', encoding='latin-1'):
     for row in r['data']:
         row.update({'name':name, 'fips':fips})
         opportunity_index_data.append(row)
-        
+
 # Turn list into data frame
 df = pd.DataFrame(opportunity_index_data)
 

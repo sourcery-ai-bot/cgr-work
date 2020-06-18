@@ -38,7 +38,7 @@ def get_ids(root_dir, state_abr):
 dirs = [d for d in listdir(root_dir) if isdir(join(root_dir, d))]
 
 # This holds the complete list of files that have been downloaded
-file_names = list()
+file_names = []
 
 # Fill up the files list
 for state_abr in dirs:
@@ -54,7 +54,7 @@ for state_abr in dirs:
 progress = 0
 for file_name in file_names:
     n_files = len(file_names)
-    progress = progress + 1
+    progress += 1
     print('Curently working on: '+file_name+' ('+str(progress)+' out of '+str(n_files)+' files)')
     split_file_name = file_name.split('.')
     new_file_name = split_file_name[0]+'.xlsx'
@@ -84,10 +84,10 @@ for file_name in file_names:
                                 new_ws.write(new_row, col, ws.cell(row, col).value)
                         # Remove the id from the list so we don't search for it again
                         ids.remove(lookup_id)
-                        if not (ids_found == 0 and new_row > 0):
+                        if ids_found != 0 or new_row <= 0:
                             # Since we skipped the duplicate header row we don't
                             # want to advance the new_row variable
-                            new_row = new_row + 1
-                        ids_found = ids_found + 1
+                            new_row += 1
+                        ids_found += 1
     new_wb.close()
 print('Done!')

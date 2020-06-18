@@ -8,15 +8,15 @@ pdf = PyPDF2.PdfFileReader(fh)
 end_page_string = '*' * 132
 start_record_string = '**** '
 
-extracted_data = dict()
+extracted_data = {}
 record_count = 0
 
 convert_me = set()
 
+look_for_data = False
 for i in range(pdf.numPages):
     page = pdf.getPage(i).extractText()
     tax_map_parcel_number = 'FAKE TAX MAP NUMBER'
-    look_for_data = False
     lines = page.split('\n')
     current_line = 0
 
@@ -46,13 +46,13 @@ for i in range(pdf.numPages):
             tax_map_parcel_number = line.split(' ')[1]
             extracted_data[tax_map_parcel_number] = {'page': (i + 1),
                                                      'record': record_count}
-            record_count = record_count + 1
+            record_count += 1
             get_data = True
 
         if end_page_string in line:
             get_data = False
 
-        current_line = current_line + 1
+        current_line += 1
 
 df = pd.DataFrame.from_dict(extracted_data, orient='index')
 
